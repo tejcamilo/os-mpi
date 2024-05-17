@@ -2,30 +2,32 @@ import socket
 import threading
 
 class MPI:
-    def __init__(self, rank, size):
+    def __init__(self, rank, size, ip_list):
         self.rank = rank
         self.size = size
         self.port = 12345
-        self.host = 'localhost'
-        self.sockets = []
+        self.ip_list = ip_list
+        self.listener = None
 
         # Initialize sockets for communication
-        for _ in range(size):
-            self.sockets.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+        self.sockets = [socket.socket(socket.AF_INET, socket.SOCK_STREAM) for _ in range(size)]
         
         # Bind sockets to ports and listen
         if rank == 0:
             self.listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.listener.bind((self.host, self.port))
+            self.listener.bind((ip_list[rank], self.port))
             self.listener.listen(size - 1)
+        
+        print(f"Process {rank} initialized on {ip_list[rank]}")
 
     def send(self, dest, data):
         # Connect to destination and send data
-        self.sockets[dest].connect((self.host, self.port))
+        self.sockets[dest].connect((self.ip_list[dest], self.port))
         self.sockets[dest].sendall(data.encode())
+        self.sockets[dest].close()
 
-    def recv(self, source):
-        # Accept connection from source and receive data
+    def recv(self):
+        # Accept connection from any source and receive data
         connection, _ = self.listener.accept()
         data = connection.recv(1024).decode()
         connection.close()
@@ -33,30 +35,28 @@ class MPI:
 
     def barrier(self):
         # Simple barrier implementation using send/receive
-        for i in range(self.size):
-            if i != self.rank:
+        if self.rank == 0:
+            # Rank 0 will receive messages from all other ranks
+            for _ in range(self.size - 1):
+                self.recv()
+            # Rank 0 will send acknowledgment to all other ranks
+            for i in range(1, self.size):
                 self.send(i, "barrier")
-            else:
-                for j in range(self.size - 1):
-                    self.recv(j)
+        else:
+            # All other ranks will send message to rank 0 and wait for acknowledgment
+            self.send(0, "barrier")
+            self.recv()
 
 # Example usage
-def example_mpi(rank, size):
-    mpi = MPI(rank, size)
-    print(f"Process {rank}: Initialized")
+if __name__ == "__main__":
+    num_processes = 2  # Example number of processes
+    ip_list = ['192.168.1.100', '192.168.1.101']
+    rank = int(input("Enter the rank of this device (0 or 1): "))
+    mpi = MPI(rank, num_processes, ip_list)
     mpi.barrier()
     print(f"Process {rank}: Passed barrier")
-    mpi.send((rank + 1) % size, f"Hello from Process {rank}!")
-    data = mpi.recv((rank - 1) % size)
-    print(f"Process {rank}: Received '{data}' from Process {(rank - 1) % size}")
-
-if __name__ == "__main__":
-    num_processes = 4
-    threads = []
-    for i in range(num_processes):
-        thread = threading.Thread(target=example_mpi, args=(i, num_processes))
-        threads.append(thread)
-        thread.start()
-
-    for thread in threads:
-        thread.join()
+    if rank == 0:
+        mpi.send(1, f"Hello from Process {rank}!")
+    else:
+        data = mpi.recv()
+        print(f"Process {rank}: Received '{data}'")
