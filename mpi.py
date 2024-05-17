@@ -2,7 +2,7 @@ import socket
 import threading
 
 class MPI:
-    def _init_(self, rank, size):
+    def __init__(self, rank, size):
         self.rank = rank
         self.size = size
         self.port = 12345
