@@ -1,4 +1,9 @@
 import socket
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
+port = int(os.getenv('PORT'))
 
 def receive_message(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -26,7 +31,6 @@ def receive_file(filename, port):
             print(f"Receiver received: {filename}")
 
 if __name__ == "__main__":
-    port = 6042  # Choose the same port used by the sender
     #receive_message(port)
     filename = "received.txt"
     receive_file(filename, port)

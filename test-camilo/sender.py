@@ -5,8 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()  # take environment variables from .env.
 source_ip = os.getenv('SOURCE_IP')
 dest_ip = os.getenv('DESTINATION_IP')
-
-print(os.getcwd())
+port = int(os.getenv('PORT'))
 
 def send_message(message, source_ip, dest_ip, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -34,9 +33,8 @@ def send_file(filename, source_ip, dest_ip, port):
 #send_file("test.txt", source_ip, dest_ip, 6042)
 
 if __name__ == "__main__":
-    port = 6042  # Choose a port to listen on
     # message = "Hello from Sender!"
     # send_message(message, source_ip, dest_ip, port)
-    filename = "/Users/ctejada/Desktop/os-proyecto/os-mpi/test-camilo/test1.py"
+    filename = "/Users/ctejada/Desktop/os-proyecto/os-mpi/test-camilo/receiver.py"
     send_file(filename, source_ip, dest_ip, port)
     
