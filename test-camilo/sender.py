@@ -20,6 +20,9 @@ def send_file(filepath, source_ip, dest_ip, port):
         s.bind((source_ip, 0))  # Bind to the source IP address
         s.connect((dest_ip, port))
         filename = os.path.basename(filepath)
+        # Send the length of the filename
+        s.sendall(len(filename).to_bytes(4, 'big'))
+        # Send the filename
         s.sendall(filename.encode())
 
         # Open the file in binary mode and send its contents
