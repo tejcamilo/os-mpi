@@ -29,4 +29,4 @@ from dotenv import load_dotenv
 load_dotenv()  # take environment variables from .env.
 source_ip = os.getenv('SOURCE_IP')
 dest_ip = os.getenv('DEST_IP')
-port = os.getenv('PORT')
+port = int(os.getenv('PORT'))
