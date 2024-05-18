@@ -15,14 +15,15 @@ def send_message(message, source_ip, dest_ip, port):
         s.sendall(message.encode())
         print(f"Sender sent: {message}")
 
-def send_file(filename, source_ip, dest_ip, port):
+def send_file(filepath, source_ip, dest_ip, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((source_ip, 0))  # Bind to the source IP address
         s.connect((dest_ip, port))
+        filename = os.path.basename(filepath)
         s.sendall(filename.encode())
 
         # Open the file in binary mode and send its contents
-        with open(filename, 'rb') as f:
+        with open(filepath, 'rb') as f:
             while True:
                 data = f.read(1024)
                 if not data:
@@ -36,9 +37,9 @@ def send_file(filename, source_ip, dest_ip, port):
 if __name__ == "__main__":
     # message = "Hello from Sender!"
     # send_message(message, source_ip, dest_ip, port)
-    filename = "/Users/ctejada/Desktop/os-proyecto/os-mpi/test-camilo/test1.py"
+    filepath = "/Users/ctejada/Desktop/os-proyecto/os-mpi/test-camilo/test1.py"
     try:
-        send_file(filename, source_ip, dest_ip, port)
+        send_file(filepath, source_ip, dest_ip, port)
     except FileNotFoundError as e:
         print(f"File not found: {e}")
     except Exception as e:

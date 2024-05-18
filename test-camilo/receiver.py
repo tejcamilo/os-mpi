@@ -25,6 +25,10 @@ def receive_file(port):
         with conn:
             # Receive the filename
             filename = conn.recv(1024).decode()
+            # Get the directory of the current script
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            # Join the directory with the filename
+            file_path = os.path.join(dir_path, filename)
             with open(filename, 'wb') as f:
                 while True:
                     data = conn.recv(1024)
