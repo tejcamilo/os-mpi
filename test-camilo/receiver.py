@@ -20,13 +20,16 @@ def receive_message(port):
 
 def run_file(file_path):
     try:
-        subprocess.run([sys.executable, file_path], check=True)
+        # "capture_output=True" disables the print of the received file
+        result = subprocess.run([sys.executable, file_path], capture_output=True, check=True)
+        output = result.stdout.decode()
     except FileNotFoundError:
         print(f"File {file_path} not found.")
     except subprocess.CalledProcessError as e:
         print(f"Error running {file_path}: {e}")
     except Exception as e:
         print(f"Unexpected error: {e}")
+    print(output)
 
 def receive_file(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

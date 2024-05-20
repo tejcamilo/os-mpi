@@ -1,3 +1,3 @@
 
-pip install tradingview_ta
-pip install python-dotenv
+tradingview_ta
+python-dotenv
