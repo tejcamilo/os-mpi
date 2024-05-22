@@ -1,3 +1,4 @@
+import json
 import socket
 import os
 from dotenv import load_dotenv
@@ -39,6 +40,13 @@ def receive_file(port):
         while True:
             conn, addr = s.accept()
             with conn:
+                # Receive the length of the variable string
+                variable_str_length = int.from_bytes(conn.recv(4), 'big')
+                # Receive and deserialize the variable string
+                variable_str = conn.recv(variable_str_length).decode()
+                run = json.loads(variable_str)
+                #print(f"run: {run}")
+
                 # Receive the length of the filename
                 filename_length = int.from_bytes(conn.recv(4), 'big')
                 # Receive the filename
@@ -55,8 +63,9 @@ def receive_file(port):
                         f.write(data)
                 print(f"Receiver received: {file_path}")
 
-            # Create a new thread to run the received file
-            threading.Thread(target=run_file, args=(file_path,)).start()
+            if run:
+                # Create a new thread to run the received file
+                threading.Thread(target=run_file, args=(file_path,)).start()
 
 
 if __name__ == "__main__":
