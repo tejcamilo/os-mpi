@@ -34,9 +34,9 @@ def run_file(file_path, conn):
         print(f"Unexpected error: {e}")
         output = f"Unexpected error: {e}"
 
-    # Send the output back to the sender
-    conn.sendall(len(output).to_bytes(4, 'big'))  # Send the length of the output string
-    conn.sendall(output.encode())  # Send the output string
+    # # Send the output back to the sender
+    # conn.sendall(len(output).to_bytes(4, 'big'))  # Send the length of the output string
+    # conn.sendall(output.encode())  # Send the output string
 
 def receive_file(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
