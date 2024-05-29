@@ -42,7 +42,11 @@ def send_file(filepath, source_ip, dest_ip, port, run=False):
 
         print(f"Sender sent: {filename}")        
 
-#send_file("test.txt", source_ip, dest_ip, 6042)
+        # Receive the length of the output string
+        output_str_length = int.from_bytes(s.recv(4), 'big')
+        # Receive and print the output string
+        output_str = s.recv(output_str_length).decode()
+        print(f"Output from receiver: {output_str}")
 
 if __name__ == "__main__":
     # message = "Hello from Sender!"

@@ -19,18 +19,24 @@ def receive_message(port):
             data = conn.recv(1024).decode()
             print(f"Receiver received: {data}")
 
-def run_file(file_path):
+def run_file(file_path, conn):
     try:
         # "capture_output=True" disables the print of the received file
         result = subprocess.run([sys.executable, file_path], capture_output=True, check=True)
         output = result.stdout.decode()
     except FileNotFoundError:
         print(f"File {file_path} not found.")
+        output = f"File {file_path} not found."
     except subprocess.CalledProcessError as e:
         print(f"Error running {file_path}: {e}")
+        output = f"Error running {file_path}: {e}"
     except Exception as e:
         print(f"Unexpected error: {e}")
-    print(output)
+        output = f"Unexpected error: {e}"
+
+    # Send the output back to the sender
+    conn.sendall(len(output).to_bytes(4, 'big'))  # Send the length of the output string
+    conn.sendall(output.encode())  # Send the output string
 
 def receive_file(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -64,8 +70,7 @@ def receive_file(port):
                 print(f"Receiver received: {file_path}")
 
             if run:
-                # Create a new thread to run the received file
-                threading.Thread(target=run_file, args=(file_path,)).start()
+                run_file(file_path, conn)
 
 
 if __name__ == "__main__":
