@@ -3,6 +3,7 @@
 ## Setup
 
 This project uses environment variables for configuration. These are stored in a `.env` file.
+Now you need to specify two ports. ```receiver.py``` uses the ```SOURCE_IP``` as the destination ip.
 
 ### Creating the .env file
 
@@ -14,6 +15,7 @@ This project uses environment variables for configuration. These are stored in a
     SOURCE_IP=X.X.X.X
     DEST_IP=X.X.X.X
     PORT=X...
+    PORT2=X....
     ```
 
 3. Save and close the `.env` file.
@@ -30,3 +32,4 @@ load_dotenv()  # take environment variables from .env.
 source_ip = os.getenv('SOURCE_IP')
 dest_ip = os.getenv('DEST_IP')
 port = int(os.getenv('PORT'))
+
