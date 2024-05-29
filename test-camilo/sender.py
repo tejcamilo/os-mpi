@@ -7,6 +7,7 @@ load_dotenv()  # take environment variables from .env.
 source_ip = os.getenv('SOURCE_IP')
 dest_ip = os.getenv('DESTINATION_IP')
 port = int(os.getenv('PORT'))
+port2 = int(os.getenv('PORT2'))
 
 def send_message(message, source_ip, dest_ip, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -42,12 +43,18 @@ def send_file(filepath, source_ip, dest_ip, port, run=False):
 
         print(f"Sender sent: {filename}")        
 
+    # Create a new socket to receive the output
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((source_ip, port2))  # Bind to the source IP address
+        s.listen()  # Listen for incoming connections
 
-        # # Receive the length of the output string
-        # output_str_length = int.from_bytes(s.recv(4), 'big')
-        # # Receive and print the output string
-        # output_str = s.recv(output_str_length).decode()
-        # print(f"Output from receiver: {output_str}")
+        conn, addr = s.accept()  # Accept a connection
+        with conn:
+            # Receive the length of the output string
+            output_str_length = int.from_bytes(conn.recv(4), 'big')
+            # Receive and print the output string
+            output_str = conn.recv(output_str_length).decode()
+            print(f"Output from receiver: {output_str}")
 
 
 if __name__ == "__main__":

@@ -8,6 +8,8 @@ import sys
 
 load_dotenv()  # take environment variables from .env.
 port = int(os.getenv('PORT'))
+port2 = int(os.getenv('PORT2'))
+dest_ip = os.getenv('SOURCE_IP')
 
 def receive_message(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -24,6 +26,10 @@ def run_file(file_path, conn):
         # "capture_output=True" disables the print of the received file
         result = subprocess.run([sys.executable, file_path], capture_output=True, check=True)
         output = result.stdout.decode()
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((dest_ip, port2))
+            s.sendall(len(output).to_bytes(4, 'big'))  # Send the length of the output string
+            s.sendall(output.encode())  # Send the output string
     except FileNotFoundError:
         print(f"File {file_path} not found.")
         output = f"File {file_path} not found."
